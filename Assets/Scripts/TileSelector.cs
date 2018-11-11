@@ -35,6 +35,7 @@ public class TileSelector : MonoBehaviour
         MoveSelector move = GetComponent<MoveSelector>();
         move.EnterState(movingPiece);
     }
+
 	// Update is called once per frame
 	void Update ()
     {
@@ -53,11 +54,14 @@ public class TileSelector : MonoBehaviour
 
             if (Input.GetMouseButtonDown(0))
             {
+                Debug.Log("Pointer at space (" + gridPoint.x + ", " + gridPoint.y + ")");
                 GameObject selectedPiece = GameManager.instance.PieceAtGrid(gridPoint);
 
                 if(GameManager.instance.DoesPieceBelongToCurrentPlayer(selectedPiece))
                 {
+                    //changes piece material to selected
                     GameManager.instance.SelectPiece(selectedPiece);
+
                     //ExitState goes here
                     ExitState(selectedPiece);
                 }

@@ -10,6 +10,7 @@ public class MoveSelector : MonoBehaviour
 
     private GameObject tileHighlight;
     private GameObject movingPiece;
+    
 
 	// Use this for initialization
 	void Start ()
@@ -34,6 +35,7 @@ public class MoveSelector : MonoBehaviour
         TileSelector selector = GetComponent<TileSelector>();
         selector.EnterState();
     }
+
 	// Update is called once per frame
 	void Update ()
     {
@@ -47,17 +49,26 @@ public class MoveSelector : MonoBehaviour
 
             tileHighlight.SetActive(true);
             tileHighlight.transform.position = Geometry.PointFromGrid(gridPoint);
-            if(Input.GetMouseButtonDown(0))
+            if(Input.GetMouseButtonDown(0) && GameManager.instance.allowedMove(movingPiece, gridPoint))
             {
                 //Ref point 2: check for valid move location
                 if(GameManager.instance.PieceAtGrid(gridPoint) == null)
                 {
+                    
+                    //check if pawn has moved
+                    Piece currentPiece = movingPiece.GetComponent(typeof(Piece)) as Piece;
+                    if (currentPiece.type == PieceType.Pawn)
+                    {
+                        Pawn movedPawn = movingPiece.GetComponent(typeof(Pawn)) as Pawn;
+                        movedPawn.hasMoved = true;
+                    }
                     GameManager.instance.Move(movingPiece, gridPoint);
+                    Debug.Log("Exited move selector");
+                    ExitState();
                 }
-                ExitState();
+                
             }
         }
-
         else
         {
             tileHighlight.SetActive(false);

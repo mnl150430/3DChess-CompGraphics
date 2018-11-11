@@ -51,6 +51,7 @@ public class GameManager : MonoBehaviour
     public GameObject blackRook;
     public GameObject blackPawn;
 
+    [SerializeField]
     private GameObject[,] pieces;
 
     private Player white;
@@ -186,4 +187,15 @@ public class GameManager : MonoBehaviour
         pieces[gridPoint.x, gridPoint.y] = piece;
         board.MovePiece(piece, gridPoint);
     }
+
+    public bool allowedMove(GameObject movingPiece, Vector2Int intendedLocation)
+    {
+        Piece currentPiece = movingPiece.GetComponent(typeof(Piece)) as Piece;
+        List<Vector2Int> possibleMoves = currentPiece.MoveLocations(GridForPiece(movingPiece));
+
+        if (possibleMoves.Contains(intendedLocation))
+            return true;
+        else
+            return false;
+    } 
 }
