@@ -1,6 +1,4 @@
-﻿
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class Rook : Piece
@@ -18,7 +16,7 @@ public class Rook : Piece
             {
                 possibleLocation = RookDirections[i] + possibleLocation;
 
-                Debug.Log("plX: " + possibleLocation.x + " plY: " + possibleLocation.y);
+                Debug.Log("rook-X: " + possibleLocation.x + " rook-Y: " + possibleLocation.y);
                 if (possibleLocation.x >= greaterBounds || possibleLocation.y >= greaterBounds || possibleLocation.x <= lesserBounds || possibleLocation.y <= lesserBounds)
                 {
                     break;

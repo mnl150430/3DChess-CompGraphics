@@ -79,6 +79,7 @@ public class GameManager : MonoBehaviour
 
     private void InitialSetup()
     {
+        /* UNCOMMENT TO HAVE ALL PIECES SPAWN NORMALLY!!!!
         AddPiece(whiteRook, white, 0, 0);
         AddPiece(whiteKnight, white, 1, 0);
         AddPiece(whiteBishop, white, 2, 0);
@@ -105,7 +106,24 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < 8; i++)
         {
             AddPiece(blackPawn, black, i, 6);
+        } */
+
+        AddPiece(whiteRook, white, 0, 0);
+        AddPiece(whiteKnight, white, 1, 0);
+        AddPiece(whiteBishop, white, 2, 0);
+        AddPiece(whiteQueen, white, 3, 0);
+        AddPiece(whiteKing, white, 4, 0);
+        AddPiece(whiteBishop, white, 5, 0);
+        AddPiece(whiteKnight, white, 6, 0);
+        AddPiece(whiteRook, white, 7, 0);
+
+        for (int i = 0; i < 8; i++)
+        {
+            AddPiece(whitePawn, white, i, 1);
         }
+
+        AddPiece(blackRook, black, 3, 3);
+        AddPiece(blackKnight, black, 0, 6);
     }
 
     public void AddPiece(GameObject prefab, Player player, int col, int row)
@@ -188,14 +206,72 @@ public class GameManager : MonoBehaviour
         board.MovePiece(piece, gridPoint);
     }
 
+    //TODO Finish checking if a move is allowed, still debating whether to return a bool or return a list of legal moves
     public bool allowedMove(GameObject movingPiece, Vector2Int intendedLocation)
     {
         Piece currentPiece = movingPiece.GetComponent(typeof(Piece)) as Piece;
-        List<Vector2Int> possibleMoves = currentPiece.MoveLocations(GridForPiece(movingPiece));
+        Vector2Int gridCurrentPiece = GridForPiece(movingPiece);
+
+        List<Vector2Int> possibleMoves = currentPiece.MoveLocations(gridCurrentPiece);
+
+        //test
+        foreach (Vector2Int grid in possibleMoves)
+        {
+            Debug.Log("Possible move list 1: [" + grid.x + ", " + grid.y + "]");
+        }
+
+        //remove all coordinates from possible moves that are blocked by enemy pieces
+        removeBlockedGrids(currentPiece, possibleMoves, gridCurrentPiece);
+
+        //remove all coordinates from possible moves that 
+        //possibleMoves.RemoveAll(move => move.x > 7 || move.x < 0 || move.y > 7 || move.y < 0);
+
+        //test
+        foreach (Vector2Int grid in possibleMoves)
+        {
+            Debug.Log("Possible move list 2: [" + grid.x + ", " + grid.y + "]");
+        }
 
         if (possibleMoves.Contains(intendedLocation))
             return true;
         else
             return false;
-    } 
+    }
+
+    //TODO change to take into consideration ally pieces as well
+    //remove possible locations past the pieces that are blocking the currently selected piece.
+    public void removeBlockedGrids(Piece currentPiece, List<Vector2Int> possibleMoves, Vector2Int gridCurrentPiece)
+    {
+        List<GameObject> otherPieces = otherPlayer.pieces;
+        int numOfOtherPieces = otherPieces.Count;
+        Vector2Int gridOtherPiece;
+
+        if (currentPiece.type != PieceType.King || currentPiece.type != PieceType.Knight || currentPiece.type != PieceType.Pawn)
+            for (int i = 0; i < numOfOtherPieces; i++)
+            {
+                gridOtherPiece = GridForPiece(otherPieces[i]);
+
+                if (possibleMoves.Contains(gridOtherPiece))
+                {
+                    if (currentPiece.type == PieceType.Rook) checkRookMoves(possibleMoves, gridOtherPiece, gridCurrentPiece);
+                    if (currentPiece.type == PieceType.Bishop) checkBishopMoves(possibleMoves, gridOtherPiece, gridCurrentPiece);
+                }
+            }
+    }
+
+    public void checkRookMoves(List<Vector2Int> moveList, Vector2Int gridOtherPiece, Vector2Int gridCurrentPiece )
+    {
+        moveList.RemoveAll(move => gridOtherPiece.x < gridCurrentPiece.x && move.x < gridOtherPiece.x ||
+                                   gridOtherPiece.x > gridCurrentPiece.x && move.x > gridOtherPiece.x ||
+                                   gridOtherPiece.y < gridCurrentPiece.y && move.y < gridOtherPiece.y ||
+                                   gridOtherPiece.y > gridCurrentPiece.y && move.y > gridOtherPiece.y);
+    }
+
+    public void checkBishopMoves(List<Vector2Int> moveList, Vector2Int gridOtherPiece, Vector2Int gridCurrentPiece)
+    {
+        moveList.RemoveAll(move => gridOtherPiece.x < gridCurrentPiece.x && gridOtherPiece.y > gridCurrentPiece.y && move.x < gridOtherPiece.x && move.y > gridOtherPiece.y ||
+                                   gridOtherPiece.x > gridCurrentPiece.x && gridOtherPiece.y > gridCurrentPiece.y && move.x > gridOtherPiece.x && move.y > gridOtherPiece.y ||
+                                   gridOtherPiece.x < gridCurrentPiece.x && gridOtherPiece.y < gridCurrentPiece.y && move.x < gridOtherPiece.x && move.y < gridOtherPiece.y ||
+                                   gridOtherPiece.x > gridCurrentPiece.x && gridOtherPiece.y < gridCurrentPiece.y && move.x > gridOtherPiece.x && move.y < gridOtherPiece.y);
+    }
 }
