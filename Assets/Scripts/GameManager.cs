@@ -1,34 +1,4 @@
-﻿/*
- * Copyright (c) 2018 Razeware LLC
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * Notwithstanding the foregoing, you may not use, copy, modify, merge, publish, 
- * distribute, sublicense, create a derivative work, and/or sell copies of the 
- * Software in any work that is designed, intended, or marketed for pedagogical or 
- * instructional purposes related to programming, coding, application development, 
- * or information technology.  Permission for such use, copying, modification,
- * merger, publication, distribution, sublicensing, creation of derivative works, 
- * or sale is expressly withheld.
- *    
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -198,6 +168,7 @@ public class GameManager : MonoBehaviour
         return currentPlayer.pieces.Contains(piece);
     }
 
+    //moves piece to specified grid coordinate
     public void Move(GameObject piece, Vector2Int gridPoint)
     {
         Vector2Int startGridPoint = GridForPiece(piece);
@@ -206,67 +177,62 @@ public class GameManager : MonoBehaviour
         board.MovePiece(piece, gridPoint);
     }
 
-    //TODO Finish checking if a move is allowed, still debating whether to return a bool or return a list of legal moves
-    public bool allowedMove(GameObject movingPiece, Vector2Int intendedLocation)
+    //Returns a list of allowed moves for the passed piece
+    public List<Vector2Int> getAllowedMoveList(GameObject movingPiece)
     {
         Piece currentPiece = movingPiece.GetComponent(typeof(Piece)) as Piece;
         Vector2Int gridCurrentPiece = GridForPiece(movingPiece);
 
         List<Vector2Int> possibleMoves = currentPiece.MoveLocations(gridCurrentPiece);
 
-        //test
-        foreach (Vector2Int grid in possibleMoves)
-        {
-            Debug.Log("Possible move list 1: [" + grid.x + ", " + grid.y + "]");
-        }
-
-        //remove all coordinates from possible moves that are blocked by enemy pieces
+        //remove all coordinates from possible moves that are blocked by pieces
         removeBlockedGrids(currentPiece, possibleMoves, gridCurrentPiece);
 
-        //remove all coordinates from possible moves that 
-        //possibleMoves.RemoveAll(move => move.x > 7 || move.x < 0 || move.y > 7 || move.y < 0);
-
-        //test
-        foreach (Vector2Int grid in possibleMoves)
-        {
-            Debug.Log("Possible move list 2: [" + grid.x + ", " + grid.y + "]");
-        }
-
-        if (possibleMoves.Contains(intendedLocation))
-            return true;
-        else
-            return false;
+        return possibleMoves;
     }
 
-    //TODO change to take into consideration ally pieces as well
+
     //remove possible locations past the pieces that are blocking the currently selected piece.
     public void removeBlockedGrids(Piece currentPiece, List<Vector2Int> possibleMoves, Vector2Int gridCurrentPiece)
     {
-        List<GameObject> otherPieces = otherPlayer.pieces;
-        int numOfOtherPieces = otherPieces.Count;
+        //obtain a list of all pieces on field
+        List<GameObject> currentPiecesOnField = currentPlayer.pieces;
+        currentPiecesOnField.AddRange(otherPlayer.pieces);
+
+        int numOfOtherPieces = currentPiecesOnField.Count;
         Vector2Int gridOtherPiece;
 
         if (currentPiece.type != PieceType.King || currentPiece.type != PieceType.Knight || currentPiece.type != PieceType.Pawn)
             for (int i = 0; i < numOfOtherPieces; i++)
             {
-                gridOtherPiece = GridForPiece(otherPieces[i]);
-
+                gridOtherPiece = GridForPiece(currentPiecesOnField[i]);
+                
                 if (possibleMoves.Contains(gridOtherPiece))
                 {
                     if (currentPiece.type == PieceType.Rook) checkRookMoves(possibleMoves, gridOtherPiece, gridCurrentPiece);
+
                     if (currentPiece.type == PieceType.Bishop) checkBishopMoves(possibleMoves, gridOtherPiece, gridCurrentPiece);
+                    if (currentPiece.type == PieceType.Queen)
+                    {
+                        checkBishopMoves(possibleMoves, gridOtherPiece, gridCurrentPiece);
+                        checkRookMoves(possibleMoves, gridOtherPiece, gridCurrentPiece);
+                    }
                 }
             }
+
+        //remove all coordinates that are out of bounds
+        possibleMoves.RemoveAll(move => move.x > 7 || move.x < 0 || move.y > 7 || move.y < 0);
     }
 
-    public void checkRookMoves(List<Vector2Int> moveList, Vector2Int gridOtherPiece, Vector2Int gridCurrentPiece )
+    public void checkRookMoves(List<Vector2Int> moveList, Vector2Int gridOtherPiece, Vector2Int gridCurrentPiece)
     {
-        moveList.RemoveAll(move => gridOtherPiece.x < gridCurrentPiece.x && move.x < gridOtherPiece.x ||
-                                   gridOtherPiece.x > gridCurrentPiece.x && move.x > gridOtherPiece.x ||
-                                   gridOtherPiece.y < gridCurrentPiece.y && move.y < gridOtherPiece.y ||
-                                   gridOtherPiece.y > gridCurrentPiece.y && move.y > gridOtherPiece.y);
-    }
 
+        moveList.RemoveAll(move => gridOtherPiece.x < gridCurrentPiece.x && gridOtherPiece.y == gridCurrentPiece.y && move.x < gridOtherPiece.x && move.y == gridOtherPiece.y ||
+                                   gridOtherPiece.x > gridCurrentPiece.x && gridOtherPiece.y == gridCurrentPiece.y && move.x > gridOtherPiece.x && move.y == gridOtherPiece.y ||
+                                   gridOtherPiece.y < gridCurrentPiece.y && gridOtherPiece.x == gridCurrentPiece.x && move.y < gridOtherPiece.y && move.x == gridOtherPiece.x ||
+                                   gridOtherPiece.y > gridCurrentPiece.y && gridOtherPiece.x == gridCurrentPiece.x && move.y > gridOtherPiece.y && move.x == gridOtherPiece.x);
+    }
+    
     public void checkBishopMoves(List<Vector2Int> moveList, Vector2Int gridOtherPiece, Vector2Int gridCurrentPiece)
     {
         moveList.RemoveAll(move => gridOtherPiece.x < gridCurrentPiece.x && gridOtherPiece.y > gridCurrentPiece.y && move.x < gridOtherPiece.x && move.y > gridOtherPiece.y ||
@@ -274,4 +240,6 @@ public class GameManager : MonoBehaviour
                                    gridOtherPiece.x < gridCurrentPiece.x && gridOtherPiece.y < gridCurrentPiece.y && move.x < gridOtherPiece.x && move.y < gridOtherPiece.y ||
                                    gridOtherPiece.x > gridCurrentPiece.x && gridOtherPiece.y < gridCurrentPiece.y && move.x > gridOtherPiece.x && move.y < gridOtherPiece.y);
     }
+    
+
 }
