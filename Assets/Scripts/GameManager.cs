@@ -176,7 +176,7 @@ public class GameManager : MonoBehaviour
 
     //GameManager.instance.DoesPieceBelongToOtherPlayer(GameManager.instance.PieceAtGrid(specificGrid))
     
-    public bool DoesPieceOnGridBelongToCurrent(Vector2Int grid)
+    public bool DoesPieceOnGridBelongToOther(Vector2Int grid)
     {
         return DoesPieceBelongToOtherPlayer(PieceAtGrid(grid));
     }

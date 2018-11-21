@@ -117,7 +117,7 @@ public class MoveSelector : MonoBehaviour
         while(numOfAttackTiles + numMove < numOfMoves)
         {
             Vector2Int specificGrid = availableMoves[numOfAttackTiles + numMove];
-            if (GameManager.instance.DoesPieceOnGridBelongToCurrent(specificGrid))
+            if (GameManager.instance.DoesPieceOnGridBelongToOther(specificGrid))
             {
                 attackHighlights[numOfAttackTiles].transform.position = Geometry.PointFromGrid(specificGrid);
                 attackHighlights[numOfAttackTiles].SetActive(true);
