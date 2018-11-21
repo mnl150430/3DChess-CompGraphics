@@ -29,6 +29,7 @@ public class GameManager : MonoBehaviour
     public Player currentPlayer;
     public Player otherPlayer;
 
+    
     void Awake()
     {
         instance = this;
@@ -168,6 +169,18 @@ public class GameManager : MonoBehaviour
         return currentPlayer.pieces.Contains(piece);
     }
 
+    public bool DoesPieceBelongToOtherPlayer(GameObject piece)
+    {
+        return otherPlayer.pieces.Contains(piece);
+    }
+
+    //GameManager.instance.DoesPieceBelongToOtherPlayer(GameManager.instance.PieceAtGrid(specificGrid))
+    
+    public bool DoesPieceOnGridBelongToCurrent(Vector2Int grid)
+    {
+        return DoesPieceBelongToOtherPlayer(PieceAtGrid(grid));
+    }
+
     //moves piece to specified grid coordinate
     public void Move(GameObject piece, Vector2Int gridPoint)
     {
@@ -196,29 +209,35 @@ public class GameManager : MonoBehaviour
     public void removeBlockedGrids(Piece currentPiece, List<Vector2Int> possibleMoves, Vector2Int gridCurrentPiece)
     {
         //obtain a list of all pieces on field
-        List<GameObject> currentPiecesOnField = currentPlayer.pieces;
+        List<GameObject> currentPiecesOnField = new List<GameObject>(currentPlayer.pieces);
         currentPiecesOnField.AddRange(otherPlayer.pieces);
 
         int numOfOtherPieces = currentPiecesOnField.Count;
         Vector2Int gridOtherPiece;
 
-        if (currentPiece.type != PieceType.King || currentPiece.type != PieceType.Knight || currentPiece.type != PieceType.Pawn)
-            for (int i = 0; i < numOfOtherPieces; i++)
-            {
-                gridOtherPiece = GridForPiece(currentPiecesOnField[i]);
-                
-                if (possibleMoves.Contains(gridOtherPiece))
-                {
-                    if (currentPiece.type == PieceType.Rook) checkRookMoves(possibleMoves, gridOtherPiece, gridCurrentPiece);
+        for (int i = 0; i < numOfOtherPieces; i++)
+        {
+            gridOtherPiece = GridForPiece(currentPiecesOnField[i]);
 
-                    if (currentPiece.type == PieceType.Bishop) checkBishopMoves(possibleMoves, gridOtherPiece, gridCurrentPiece);
-                    if (currentPiece.type == PieceType.Queen)
-                    {
-                        checkBishopMoves(possibleMoves, gridOtherPiece, gridCurrentPiece);
-                        checkRookMoves(possibleMoves, gridOtherPiece, gridCurrentPiece);
-                    }
+            if (possibleMoves.Contains(gridOtherPiece))
+            {
+                //remove type rook
+                if (currentPiece.type == PieceType.Rook) checkRookMoves(possibleMoves, gridOtherPiece, gridCurrentPiece);
+
+                //remove type bishop
+                if (currentPiece.type == PieceType.Bishop) checkBishopMoves(possibleMoves, gridOtherPiece, gridCurrentPiece);
+
+                //remove type queen
+                if (currentPiece.type == PieceType.Queen)
+                {
+                    checkBishopMoves(possibleMoves, gridOtherPiece, gridCurrentPiece);
+                    checkRookMoves(possibleMoves, gridOtherPiece, gridCurrentPiece);
                 }
+
+                //remove ally piece
+                if (DoesPieceBelongToCurrentPlayer(currentPiecesOnField[i])) possibleMoves.Remove(gridOtherPiece);
             }
+        }
 
         //remove all coordinates that are out of bounds
         possibleMoves.RemoveAll(move => move.x > 7 || move.x < 0 || move.y > 7 || move.y < 0);

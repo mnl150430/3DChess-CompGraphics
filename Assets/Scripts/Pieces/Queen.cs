@@ -16,7 +16,7 @@ public class Queen : Piece
             {
                 possibleLocation = RookDirections[i] + possibleLocation;
 
-                Debug.Log("queen-X: " + possibleLocation.x + " queen-Y: " + possibleLocation.y);
+                //Debug.Log("queen-X: " + possibleLocation.x + " queen-Y: " + possibleLocation.y);
                 if (possibleLocation.x >= greaterBounds || possibleLocation.y >= greaterBounds || possibleLocation.x <= lesserBounds || possibleLocation.y <= lesserBounds)
                 {
                     break;
@@ -32,7 +32,7 @@ public class Queen : Piece
             {
                 possibleLocation = BishopDirections[i] + possibleLocation;
 
-                Debug.Log("queen-X: " + possibleLocation.x + " queen-Y: " + possibleLocation.y);
+                //Debug.Log("queen-X: " + possibleLocation.x + " queen-Y: " + possibleLocation.y);
                 if (possibleLocation.x >= greaterBounds || possibleLocation.y >= greaterBounds || possibleLocation.x <= lesserBounds || possibleLocation.y <= lesserBounds)
                 {
                     break;
