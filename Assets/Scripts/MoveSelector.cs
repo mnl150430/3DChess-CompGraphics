@@ -80,8 +80,9 @@ public class MoveSelector : MonoBehaviour
             if (Input.GetMouseButtonDown(0))
             {
                 //if user grid choice is a valid one, then move there
-                if (availableMoves.Contains(gridPoint) && GameManager.instance.PieceAtGrid(gridPoint) == null)
+                if (availableMoves.Contains(gridPoint) )
                 {
+                    //&& GameManager.instance.PieceAtGrid(gridPoint) == null
                     //check if pawn has moved
                     Piece currentPiece = movingPiece.GetComponent(typeof(Piece)) as Piece;
                     if (currentPiece.type == PieceType.Pawn)
@@ -90,6 +91,13 @@ public class MoveSelector : MonoBehaviour
                         movedPawn.hasMoved = true;
                     }
                     deactivateMoveTiles();
+
+                    //if moving space is owned by other player piece
+                    GameObject pieceAtLocation = GameManager.instance.PieceAtGrid(gridPoint);
+                    if (GameManager.instance.DoesPieceBelongToOtherPlayer(pieceAtLocation))
+                    {
+                        GameManager.instance.RemovePiece(pieceAtLocation);
+                    }
                     GameManager.instance.StartCoroutine(GameManager.instance.Move(movingPiece, gridPoint));
                     ExitState();
                 } 
@@ -113,8 +121,15 @@ public class MoveSelector : MonoBehaviour
     {
         int numOfMoves = availableMoves.Count;
         int numMove = 0;
-
-        while(numOfAttackTiles + numMove < numOfMoves)
+        Debug.Log("number of pieces belonging to OTHER: " + GameManager.instance.otherPlayer.pieces.Count);
+        int counter = 0;
+        foreach(GameObject piece in GameManager.instance.otherPlayer.pieces)
+        {
+            counter++;
+            Debug.Log("Piece #" + counter + " at location: " + Geometry.GridFromPoint(piece.transform.position));
+            
+        }
+        while (numOfAttackTiles + numMove < numOfMoves)
         {
             Vector2Int specificGrid = availableMoves[numOfAttackTiles + numMove];
             if (GameManager.instance.DoesPieceOnGridBelongToOther(specificGrid))

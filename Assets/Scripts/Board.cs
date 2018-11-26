@@ -69,11 +69,21 @@ public class Board : MonoBehaviour
         Vector2Int gridPoint = Geometry.GridPoint(col, row);
         GameObject newPiece = Instantiate(piece, Geometry.PointFromGrid(gridPoint),
             Quaternion.identity, gameObject.transform);
+        
         return newPiece;
     }
 
     public void RemovePiece(GameObject piece)
     {
+        //if piece belongs to current player, remove from their inventory
+        if(GameManager.instance.DoesPieceBelongToCurrentPlayer(piece))
+        {
+            GameManager.instance.currentPlayer.pieces.Remove(piece);
+        }
+        else
+        {
+            GameManager.instance.otherPlayer.pieces.Remove(piece);
+        }
         Destroy(piece);
     }
 

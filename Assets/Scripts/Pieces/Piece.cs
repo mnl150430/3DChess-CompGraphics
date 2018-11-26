@@ -8,7 +8,6 @@ public abstract class Piece : MonoBehaviour
 {
 
     public PieceType type;
-
     public PieceColor color;
 
     //forward, right, backward, left

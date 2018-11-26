@@ -53,7 +53,7 @@ public class GameManager : MonoBehaviour
 
     private void InitialSetup()
     {
-        /* UNCOMMENT TO HAVE ALL PIECES SPAWN NORMALLY!!!!
+        
         AddPiece(whiteRook, white, 0, 0);
         AddPiece(whiteKnight, white, 1, 0);
         AddPiece(whiteBishop, white, 2, 0);
@@ -80,24 +80,7 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < 8; i++)
         {
             AddPiece(blackPawn, black, i, 6);
-        } */
-
-        AddPiece(whiteRook, white, 0, 0);
-        AddPiece(whiteKnight, white, 1, 0);
-        AddPiece(whiteBishop, white, 2, 0);
-        AddPiece(whiteQueen, white, 3, 0);
-        AddPiece(whiteKing, white, 4, 0);
-        AddPiece(whiteBishop, white, 5, 0);
-        AddPiece(whiteKnight, white, 6, 0);
-        AddPiece(whiteRook, white, 7, 0);
-
-        for (int i = 0; i < 8; i++)
-        {
-            AddPiece(whitePawn, white, i, 1);
-        }
-
-        AddPiece(blackRook, black, 3, 3);
-        AddPiece(blackKnight, black, 0, 6);
+        } 
     }
 
     public void AddPiece(GameObject prefab, Player player, int col, int row)
@@ -105,6 +88,11 @@ public class GameManager : MonoBehaviour
         GameObject pieceObject = board.AddPiece(prefab, col, row);
         player.pieces.Add(pieceObject);
         pieces[col, row] = pieceObject;
+    }
+
+    public void RemovePiece(GameObject piece)
+    {
+        board.RemovePiece(piece);
     }
 
     public void SelectPieceAtGrid(Vector2Int gridPoint)
@@ -196,6 +184,16 @@ public class GameManager : MonoBehaviour
         yield return board.StartCoroutine(board.MovePiece(piece, gridPoint));
         //Debug.Log("Exited board's move function!!!!!!!!!!!!!!!!!!!!!" + " NEW LOCATION: " + piece.transform.position);
         safeToMove = true;
+        Player tempPlayer = new Player("temp", true);
+        tempPlayer = otherPlayer;
+        otherPlayer = currentPlayer;
+        currentPlayer = tempPlayer;
+        Debug.Log("other player holds: " + otherPlayer.name);
+        Debug.Log("current player holds: " + currentPlayer.name);
+
+        //locating king
+        GameObject foundPiece = otherPlayer.pieces.Find(x => (x.GetComponent(typeof(Piece)) as Piece).type == PieceType.King);
+        Debug.Log("Other King is at " + GridForPiece(foundPiece));
     }
 
 
@@ -243,15 +241,65 @@ public class GameManager : MonoBehaviour
                     checkRookMoves(possibleMoves, gridOtherPiece, gridCurrentPiece);
                 }
 
+                if (currentPiece.type == PieceType.Pawn) checkPawnMovesForward(possibleMoves, gridOtherPiece, gridCurrentPiece);
+
                 //remove ally piece
                 if (DoesPieceBelongToCurrentPlayer(currentPiecesOnField[i])) possibleMoves.Remove(gridOtherPiece);
             }
         }
 
+        //remove type pawn
+        if (currentPiece.type == PieceType.Pawn) checkPawnMovesDiagonal(possibleMoves, gridCurrentPiece);
+
+
         //remove all coordinates that are out of bounds
         possibleMoves.RemoveAll(move => move.x > 7 || move.x < 0 || move.y > 7 || move.y < 0);
     }
+    public void checkPawnMovesForward(List<Vector2Int> moveList, Vector2Int gridOtherPiece, Vector2Int gridCurrentPiece)
+    { 
+        if (currentPlayer == white)
+            moveList.RemoveAll(move => gridOtherPiece.x == gridCurrentPiece.x && gridOtherPiece.y > gridCurrentPiece.y && move.x == gridCurrentPiece.x && move.y >= gridOtherPiece.y);
 
+        if (currentPlayer == black)
+            moveList.RemoveAll(move => gridOtherPiece.x == gridCurrentPiece.x && gridOtherPiece.y < gridCurrentPiece.y && move.x == gridCurrentPiece.x && move.y < gridCurrentPiece.y);
+    }
+
+    public void checkPawnMovesDiagonal(List<Vector2Int> moveList, Vector2Int gridCurrentPiece)
+    {
+        Vector2Int diagonalLeft = new Vector2Int();
+        Vector2Int diagonalRight = new Vector2Int();
+
+        if (currentPlayer == white)
+        {
+            diagonalLeft.x = gridCurrentPiece.x - 1;
+            diagonalLeft.y = gridCurrentPiece.y + 1;
+
+            diagonalRight.x = gridCurrentPiece.x + 1;
+            diagonalRight.y = gridCurrentPiece.y + 1;
+
+            //if piece at grid does not belong to other player
+            if (!DoesPieceBelongToOtherPlayer(PieceAtGrid(diagonalLeft)))
+                moveList.Remove(diagonalLeft);
+
+            if (!DoesPieceBelongToOtherPlayer(PieceAtGrid(diagonalRight)))
+                moveList.Remove(diagonalRight);
+        }
+        else if(currentPlayer == black)
+        {
+            diagonalLeft.x = gridCurrentPiece.x + 1;
+            diagonalLeft.y = gridCurrentPiece.y - 1;
+
+            diagonalRight.x = gridCurrentPiece.x - 1;
+            diagonalRight.y = gridCurrentPiece.y - 1;
+
+            //if piece at grid does not belong to other player
+            if (!DoesPieceBelongToOtherPlayer(PieceAtGrid(diagonalLeft)))
+                moveList.Remove(diagonalLeft);
+
+            if (!DoesPieceBelongToOtherPlayer(PieceAtGrid(diagonalRight)))
+                moveList.Remove(diagonalRight);
+        }
+    }
     public void checkRookMoves(List<Vector2Int> moveList, Vector2Int gridOtherPiece, Vector2Int gridCurrentPiece)
     {
 

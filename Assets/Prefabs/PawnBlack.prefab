@@ -126,3 +126,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   type: 5
   color: 1
+  hasMoved: 0
