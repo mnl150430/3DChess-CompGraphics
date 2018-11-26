@@ -90,7 +90,7 @@ public class MoveSelector : MonoBehaviour
                         movedPawn.hasMoved = true;
                     }
                     deactivateMoveTiles();
-                    GameManager.instance.Move(movingPiece, gridPoint);
+                    GameManager.instance.StartCoroutine(GameManager.instance.Move(movingPiece, gridPoint));
                     ExitState();
                 } 
                 else if(GameManager.instance.GridForPiece(movingPiece) == gridPoint)
@@ -135,6 +135,7 @@ public class MoveSelector : MonoBehaviour
     //deactivates move tiles previously activated by available moves list
     private void deactivateMoveTiles()
     {
+        
         int numOfMoves = availableMoves.Count;
         for (int i = 0; i < numOfMoves - numOfAttackTiles; i++)
         {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -24,6 +25,7 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private GameObject[,] pieces;
 
+    public bool safeToMove;
     private Player white;
     private Player black;
     public Player currentPlayer;
@@ -37,6 +39,7 @@ public class GameManager : MonoBehaviour
 
     void Start ()
     {
+        safeToMove = true;
         pieces = new GameObject[8, 8];
 
         white = new Player("white", true);
@@ -182,13 +185,19 @@ public class GameManager : MonoBehaviour
     }
 
     //moves piece to specified grid coordinate
-    public void Move(GameObject piece, Vector2Int gridPoint)
+    public IEnumerator Move(GameObject piece, Vector2Int gridPoint)
     {
+        safeToMove = false;
         Vector2Int startGridPoint = GridForPiece(piece);
         pieces[startGridPoint.x, startGridPoint.y] = null;
         pieces[gridPoint.x, gridPoint.y] = piece;
-        board.MovePiece(piece, gridPoint);
+        //Debug.Log("OLD LOCATION: " + piece.transform.position);
+       
+        yield return board.StartCoroutine(board.MovePiece(piece, gridPoint));
+        //Debug.Log("Exited board's move function!!!!!!!!!!!!!!!!!!!!!" + " NEW LOCATION: " + piece.transform.position);
+        safeToMove = true;
     }
+
 
     //Returns a list of allowed moves for the passed piece
     public List<Vector2Int> getAllowedMoveList(GameObject movingPiece)

@@ -57,7 +57,7 @@ public class TileSelector : MonoBehaviour
                 Debug.Log("Pointer at space (" + gridPoint.x + ", " + gridPoint.y + ")");
                 GameObject selectedPiece = GameManager.instance.PieceAtGrid(gridPoint);
 
-                if(GameManager.instance.DoesPieceBelongToCurrentPlayer(selectedPiece))
+                if(GameManager.instance.DoesPieceBelongToCurrentPlayer(selectedPiece) && GameManager.instance.safeToMove == true)
                 {
                     //changes piece material to selected
                     GameManager.instance.SelectPiece(selectedPiece);
