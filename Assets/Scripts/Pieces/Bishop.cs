@@ -16,7 +16,7 @@ public class Bishop : Piece
             {
                 possibleLocation = BishopDirections[i] + possibleLocation;
 
-                Debug.Log("bishop-X: " + possibleLocation.x + " bishop-Y: " + possibleLocation.y);
+                //Debug.Log("bishop-X: " + possibleLocation.x + " bishop-Y: " + possibleLocation.y);
                 if (possibleLocation.x >= greaterBounds || possibleLocation.y >= greaterBounds || possibleLocation.x <= lesserBounds || possibleLocation.y <= lesserBounds)
                 {
                     break;

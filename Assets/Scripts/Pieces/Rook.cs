@@ -16,7 +16,7 @@ public class Rook : Piece
             {
                 possibleLocation = RookDirections[i] + possibleLocation;
 
-                Debug.Log("rook-X: " + possibleLocation.x + " rook-Y: " + possibleLocation.y);
+                //Debug.Log("rook-X: " + possibleLocation.x + " rook-Y: " + possibleLocation.y);
                 if (possibleLocation.x >= greaterBounds || possibleLocation.y >= greaterBounds || possibleLocation.x <= lesserBounds || possibleLocation.y <= lesserBounds)
                 {
                     break;

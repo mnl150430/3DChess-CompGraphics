@@ -29,7 +29,7 @@ public class MoveSelector : MonoBehaviour
         moveHighlights = new List<GameObject>();
         for (int i = 0; i < 27; i++)
         {
-            Debug.Log("for index: " + i);
+            //Debug.Log("for index: " + i);
             moveHighlights.Add(Instantiate(moveLocationPrefab, Geometry.PointFromGrid(new Vector2Int(0, 0)), Quaternion.identity, gameObject.transform));
             moveHighlights[i].SetActive(false);
         }
@@ -121,12 +121,12 @@ public class MoveSelector : MonoBehaviour
     {
         int numOfMoves = availableMoves.Count;
         int numMove = 0;
-        Debug.Log("number of pieces belonging to OTHER: " + GameManager.instance.otherPlayer.pieces.Count);
+        //Debug.Log("number of pieces belonging to OTHER: " + GameManager.instance.otherPlayer.pieces.Count);
         int counter = 0;
         foreach(GameObject piece in GameManager.instance.otherPlayer.pieces)
         {
             counter++;
-            Debug.Log("Piece #" + counter + " at location: " + Geometry.GridFromPoint(piece.transform.position));
+            //Debug.Log("Piece #" + counter + " at location: " + Geometry.GridFromPoint(piece.transform.position));
             
         }
         while (numOfAttackTiles + numMove < numOfMoves)

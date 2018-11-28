@@ -7,9 +7,13 @@ public class MidGameNoticeView : MonoBehaviour
 
     public GameObject MainPanel;
     public GameObject SettingsPanel;
-    //public GameObject HelpPanel;
-    public GameObject BackButton;
-    public GameObject ReturnButton;
+    public GameObject BackGround;
+    public GameObject OldBackground;
+    public GameObject HelpPanel;
+    public GameObject SBackButton;
+    public GameObject SReturnButton;
+    public GameObject HBackButton;
+    public GameObject HReturnButton;
     void Start () 
     {
 
@@ -18,13 +22,25 @@ public class MidGameNoticeView : MonoBehaviour
                 MainPanel.SetActive(false);
                 if (PlayerPrefs.GetString("From").Equals("Sounds"))
                 {
+                    OldBackground.SetActive(false);
+                    BackGround.SetActive(true);
                     SettingsPanel.SetActive(true);
-                    //HelpPanel.SetActive(false);
-                    BackButton.SetActive(false);
-                    ReturnButton.SetActive(true);
+                    HelpPanel.SetActive(false);
+                    SBackButton.SetActive(false);
+                    SReturnButton.SetActive(true);
                 }
+                 else if (PlayerPrefs.GetString("From").Equals("Help"))
+                 {
+                        OldBackground.SetActive(false);
+                        BackGround.SetActive(true);
+                        SettingsPanel.SetActive(false);
+                        HelpPanel.SetActive(true);
+                        HBackButton.SetActive(false);
+                        HReturnButton.SetActive(true);
+                  }
             PlayerPrefs.SetString("MidGame", "No");
-            }
+
+        }
      }
        
 

@@ -9,7 +9,7 @@ public class ChangeVolume : MonoBehaviour
 
     public Slider MainSlider;
     public Slider MusicSlider;
-    public Slider mySlider;
+    public Slider SoundsSlider;
 
     float mainVolume;
     float musicVolume;
@@ -21,8 +21,10 @@ public class ChangeVolume : MonoBehaviour
         {
             mainVolume = PlayerPrefs.GetFloat("MainVolume");
             musicVolume = PlayerPrefs.GetFloat("MusicVolume");
+            soundsVolume = PlayerPrefs.GetFloat("SoundsVolume");
             MainSlider.value = mainVolume;
             MusicSlider.value = musicVolume;
+            SoundsSlider.value = soundsVolume;
         }
         catch (Exception ex)
         {
@@ -37,7 +39,7 @@ public class ChangeVolume : MonoBehaviour
     {
         mainVolume = MainSlider.value;
         PlayerPrefs.SetFloat("MainVolume", mainVolume);
-        setMusicVolume();
+        //setMusicVolume();
     }
     public void setMusicVolume()
     {
@@ -46,7 +48,7 @@ public class ChangeVolume : MonoBehaviour
     }
     public void setSoundsVolume()
     {
-        soundsVolume = (mySlider.value * PlayerPrefs.GetFloat("MainVolume"));
+        soundsVolume = SoundsSlider.value;
         PlayerPrefs.SetFloat("SoundsVolume", soundsVolume);
     }
 }

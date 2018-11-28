@@ -1,6 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using System;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 public class GameManager : MonoBehaviour
 {
@@ -23,7 +27,10 @@ public class GameManager : MonoBehaviour
     public GameObject blackPawn;
 
     [SerializeField]
-    private GameObject[,] pieces;
+    public GameObject[,] pieces;
+    public List<GameObject> allPieces;
+
+    public SavedData saver;
 
     public bool safeToMove;
     private Player white;
@@ -31,26 +38,100 @@ public class GameManager : MonoBehaviour
     public Player currentPlayer;
     public Player otherPlayer;
 
+    public String playerTurn;
+    public Text Player1;
+    public Text Player2;
+    public AudioSource playerMoved;
     
     void Awake()
     {
-        instance = this;
+            instance = this;
     }
 
     void Start ()
     {
+
         safeToMove = true;
         pieces = new GameObject[8, 8];
-
         white = new Player("white", true);
         black = new Player("black", false);
 
-        currentPlayer = white;
-        otherPlayer = black;
+        if (PlayerPrefs.GetString("From").Equals("NewGame"))
+        {
+            currentPlayer = white;
+            otherPlayer = black;
+            Player1.color = Color.yellow;
+            Player2.color = Color.cyan;
+            InitialSetup();
+        }
 
-        InitialSetup();
+        else
+        {
+            saver = openSaved();
+  
+            playerTurn = saver.playerTurned;
+            if (playerTurn.Equals("white"))
+            {
+                currentPlayer = white;
+                otherPlayer = black;
+                Player1.color = Color.yellow;
+                Player2.color = Color.cyan;
+            }
+            else
+            {
+                currentPlayer = black;
+                otherPlayer = white;
+                Player2.color = Color.yellow;
+                Player1.color = Color.cyan;
+
+            }
+            ResumeSetup();
+
+        }
     }
+    private void ResumeSetup()
+    {
+        List<SudoPiece> tempList = saver.allThePieces;
+        foreach (SudoPiece x in tempList)
+        {
+            if(x.name.Equals("whiteKnight"))
+                AddPiece(whiteKnight, white, x.col, x.row);
 
+            else if (x.name.Equals("whiteRook"))
+                AddPiece(whiteRook, white, x.col, x.row);
+
+            else if (x.name.Equals("whiteBishop"))
+                AddPiece(whiteBishop, white, x.col, x.row);
+           
+            else if (x.name.Equals("whiteQueen"))
+                AddPiece(whiteQueen, white, x.col, x.row);
+           
+            else if (x.name.Equals("whiteKing"))
+                AddPiece(whiteKing, white, x.col, x.row);
+
+            else if (x.name.Equals("whitePawn"))
+                AddPiece(whitePawn, white, x.col, x.row);
+
+            else if (x.name.Equals("blackRook"))
+                AddPiece(blackRook, black, x.col, x.row);
+          
+            else if (x.name.Equals("blackKnight"))
+                AddPiece(blackKnight, black, x.col, x.row);
+           
+            else if (x.name.Equals("blackBishop"))
+                AddPiece(blackBishop, black, x.col, x.row);
+
+            else if (x.name.Equals("blackQueen"))
+                AddPiece(blackQueen, black, x.col, x.row);
+
+            else if (x.name.Equals("blackKing"))
+                AddPiece(blackKing, black, x.col, x.row);
+
+            else if (x.name.Equals("blackPawn"))
+                AddPiece(blackPawn, black, x.col, x.row);
+
+        }
+    }
     private void InitialSetup()
     {
         
@@ -80,14 +161,17 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < 8; i++)
         {
             AddPiece(blackPawn, black, i, 6);
-        } 
-    }
+        }
 
+    }
+   
     public void AddPiece(GameObject prefab, Player player, int col, int row)
     {
         GameObject pieceObject = board.AddPiece(prefab, col, row);
         player.pieces.Add(pieceObject);
         pieces[col, row] = pieceObject;
+
+   
     }
 
     public void RemovePiece(GameObject piece)
@@ -180,20 +264,37 @@ public class GameManager : MonoBehaviour
         pieces[startGridPoint.x, startGridPoint.y] = null;
         pieces[gridPoint.x, gridPoint.y] = piece;
         //Debug.Log("OLD LOCATION: " + piece.transform.position);
-       
+
+
+
         yield return board.StartCoroutine(board.MovePiece(piece, gridPoint));
+        playerMoved.PlayDelayed(0.2f);
         //Debug.Log("Exited board's move function!!!!!!!!!!!!!!!!!!!!!" + " NEW LOCATION: " + piece.transform.position);
         safeToMove = true;
         Player tempPlayer = new Player("temp", true);
         tempPlayer = otherPlayer;
         otherPlayer = currentPlayer;
         currentPlayer = tempPlayer;
-        Debug.Log("other player holds: " + otherPlayer.name);
-        Debug.Log("current player holds: " + currentPlayer.name);
+
+        if (currentPlayer == black)
+        {
+            Player1.color = Color.cyan;
+            Player2.color = Color.yellow;
+            playerTurn = "black";
+        }
+        else
+        {
+            Player1.color = Color.yellow;
+            Player2.color = Color.cyan;
+            playerTurn = "white";
+        }
+    
+        //Debug.Log("other player holds: " + otherPlayer.name);
+        //Debug.Log("current player holds: " + currentPlayer.name);
 
         //locating king
-        GameObject foundPiece = otherPlayer.pieces.Find(x => (x.GetComponent(typeof(Piece)) as Piece).type == PieceType.King);
-        Debug.Log("Other King is at " + GridForPiece(foundPiece));
+        //GameObject foundPiece = otherPlayer.pieces.Find(x => (x.GetComponent(typeof(Piece)) as Piece).type == PieceType.King);
+        //Debug.Log("Other King is at " + GridForPiece(foundPiece));
     }
 
 
@@ -316,6 +417,102 @@ public class GameManager : MonoBehaviour
                                    gridOtherPiece.x < gridCurrentPiece.x && gridOtherPiece.y < gridCurrentPiece.y && move.x < gridOtherPiece.x && move.y < gridOtherPiece.y ||
                                    gridOtherPiece.x > gridCurrentPiece.x && gridOtherPiece.y < gridCurrentPiece.y && move.x > gridOtherPiece.x && move.y < gridOtherPiece.y);
     }
-    
+
+
+    public void MultiToList()
+    {
+        int width = pieces.GetLength(0);
+        int height = pieces.GetLength(1);
+        GameObject temper;
+        String tempname = "";
+        String clone = "(Clone)";
+        String name = "";
+        String color = "";
+        allPieces  = new List<GameObject>(width * height);
+        saver = new SavedData();
+        for (int i = 0; i < width; i++)
+            for (int j = 0; j < height; j++)
+                if (pieces[i, j] != null)
+                {
+
+                    allPieces.Add(pieces[i, j]);
+                    temper = pieces[i, j];
+                    tempname = temper.name;
+                    if (tempname.EndsWith(clone))
+                        name = tempname.Remove(tempname.Length - clone.Length);
+                    if (name.Contains("White"))
+                        color = "white";
+
+                    else if (name.Contains("Black"))
+                        color = "black";
+
+                    name = name.Remove(name.Length - 5);
+                    name = color + name;
+                    SudoPiece sample = new SudoPiece(name, color, i,j);
+                    saver.allThePieces.Add(sample); 
+                   
+                }    
+    }
+    public String getPlayerTurn()
+    {
+        return playerTurn;
+    }
+    public SavedData openSaved()
+    {
+        try
+        {
+            using (Stream stream = File.Open("data.bin", FileMode.Open))
+            {
+                BinaryFormatter bin = new BinaryFormatter();
+                SavedData loader = (SavedData)bin.Deserialize(stream);
+                return loader;
+               
+            }
+        }
+        catch (IOException)
+        {
+            return null;
+        }
+    }
+
+}
+
+[Serializable()]
+public class SudoPiece
+{
+    public String name;
+    public String color;
+    public int col;
+    public int row;
+
+    public SudoPiece(string a ,string b, int x, int y)
+    {
+        name = a;
+        color = b;
+        col = x;
+        row = y;
+
+    }
+}
+
+[Serializable()]
+public class SavedData
+{
+    public String playerTurned;
+    public List<SudoPiece> allThePieces;
+
+    public SavedData()
+    {
+        try
+        {
+            playerTurned = GameManager.instance.getPlayerTurn();
+        }
+        catch(Exception ex){}
+
+        allThePieces = new List<SudoPiece>();
+    }
+
+
+
 
 }

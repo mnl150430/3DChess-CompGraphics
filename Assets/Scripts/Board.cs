@@ -109,7 +109,7 @@ public class Board : MonoBehaviour
         {
             yield return null; // wait until next frame
         }
-        Debug.Log("COROUTINE FINISHED");
+        //Debug.Log("COROUTINE FINISHED");
     }
 
     public void SelectPiece(GameObject piece)

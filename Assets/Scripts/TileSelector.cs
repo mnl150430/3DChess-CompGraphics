@@ -13,12 +13,14 @@ public class TileSelector : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
-        Vector2Int gridPoint = Geometry.GridPoint(0, 0);
-        Vector3 point = Geometry.PointFromGrid(gridPoint);
-        tileHighlight = Instantiate(tileHighlightPrefab, point, Quaternion.identity, gameObject.transform);
-        tileHighlight.SetActive(false);
+       
+            Vector2Int gridPoint = Geometry.GridPoint(0, 0);
+            Vector3 point = Geometry.PointFromGrid(gridPoint);
+            tileHighlight = Instantiate(tileHighlightPrefab, point, Quaternion.identity, gameObject.transform);
+            tileHighlight.SetActive(false);
 
-        
+
+
     }
 
     public void EnterState()
@@ -54,7 +56,7 @@ public class TileSelector : MonoBehaviour
 
             if (Input.GetMouseButtonDown(0))
             {
-                Debug.Log("Pointer at space (" + gridPoint.x + ", " + gridPoint.y + ")");
+                //Debug.Log("Pointer at space (" + gridPoint.x + ", " + gridPoint.y + ")");
                 GameObject selectedPiece = GameManager.instance.PieceAtGrid(gridPoint);
 
                 if(GameManager.instance.DoesPieceBelongToCurrentPlayer(selectedPiece) && GameManager.instance.safeToMove == true)

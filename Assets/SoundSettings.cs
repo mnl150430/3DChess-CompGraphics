@@ -4,29 +4,24 @@ using UnityEngine;
 using UnityEngine.Audio;
 using System;
 
-public class AudioSettings : MonoBehaviour 
+public class SoundSettings : MonoBehaviour
 {
 
-    public AudioSource mainSong;
-   
+    public AudioSource soundEffect;
+
     float mainVolume;
-    float musicVolume;
+    float SoundVolume;
     // Update is called once per frame
 
-    private void Start()
+
+    void Update()
     {
-        mainSong.volume = 1.0f;
-       
-    }
-    void Update () 
-    {
-       
         try
         {
-            mainSong.volume = (((1.0f+PlayerPrefs.GetFloat("MusicVolume"))+(1.0f+PlayerPrefs.GetFloat("MainVolume")))/2.0f)-1.0f;
+            soundEffect.volume = (((1.0f + PlayerPrefs.GetFloat("SoundsVolume")) + (1.0f + PlayerPrefs.GetFloat("MainVolume"))) / 2.0f) - 1.0f;
 
-            if ((Mathf.Approximately(PlayerPrefs.GetFloat("MainVolume"), 0.0f)) || (Mathf.Approximately(PlayerPrefs.GetFloat("MusicVolume"), 0.0f)))
-                mainSong.volume = 0.0f;
+            if ((Mathf.Approximately(PlayerPrefs.GetFloat("MainVolume"), 0.0f)) || (Mathf.Approximately(PlayerPrefs.GetFloat("SoundsVolume"), 0.0f)))
+                soundEffect.volume = 0.0f;
         }
         catch (Exception ex)
         {
@@ -34,7 +29,7 @@ public class AudioSettings : MonoBehaviour
             Console.WriteLine();
             Console.WriteLine("Press any key to continue");
             Console.ReadLine();
-            mainSong.volume = 1.0f;
+            soundEffect.volume = 1.0f;
             PlayerPrefs.SetFloat("MainVolume", 1.0f);
             PlayerPrefs.SetFloat("MusicVolume", 1.0f);
             PlayerPrefs.SetFloat("SoundsVolume", 1.0f);

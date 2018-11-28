@@ -1,5 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
+using System.Runtime.Serialization.Formatters.Binary;
+
 
 public class Player
 {
