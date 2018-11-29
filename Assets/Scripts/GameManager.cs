@@ -362,7 +362,7 @@ public class GameManager : MonoBehaviour
             moveList.RemoveAll(move => gridOtherPiece.x == gridCurrentPiece.x && gridOtherPiece.y > gridCurrentPiece.y && move.x == gridCurrentPiece.x && move.y >= gridOtherPiece.y);
 
         if (currentPlayer == black)
-            moveList.RemoveAll(move => gridOtherPiece.x == gridCurrentPiece.x && gridOtherPiece.y < gridCurrentPiece.y && move.x == gridCurrentPiece.x && move.y < gridCurrentPiece.y);
+            moveList.RemoveAll(move => gridOtherPiece.x == gridCurrentPiece.x && gridOtherPiece.y < gridCurrentPiece.y && move.x == gridCurrentPiece.x && move.y <= gridOtherPiece.y);
     }
 
     public void checkPawnMovesDiagonal(List<Vector2Int> moveList, Vector2Int gridCurrentPiece)
