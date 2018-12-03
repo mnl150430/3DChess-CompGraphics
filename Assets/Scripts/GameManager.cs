@@ -41,6 +41,10 @@ public class GameManager : MonoBehaviour
     public String playerTurn;
     public Text Player1;
     public Text Player2;
+
+    public Button Player1View;
+    public Button Player2View;
+
     public AudioSource playerMoved;
     
     void Awake()
@@ -62,6 +66,7 @@ public class GameManager : MonoBehaviour
             otherPlayer = black;
             Player1.color = Color.yellow;
             Player2.color = Color.cyan;
+            Player1View.onClick.Invoke();
             InitialSetup();
         }
 
@@ -76,6 +81,7 @@ public class GameManager : MonoBehaviour
                 otherPlayer = black;
                 Player1.color = Color.yellow;
                 Player2.color = Color.cyan;
+                Player1View.onClick.Invoke();
             }
             else
             {
@@ -83,7 +89,7 @@ public class GameManager : MonoBehaviour
                 otherPlayer = white;
                 Player2.color = Color.yellow;
                 Player1.color = Color.cyan;
-
+                Player2View.onClick.Invoke();
             }
             ResumeSetup();
 
@@ -164,7 +170,7 @@ public class GameManager : MonoBehaviour
         }
 
     }
-   
+
     public void AddPiece(GameObject prefab, Player player, int col, int row)
     {
         GameObject pieceObject = board.AddPiece(prefab, col, row);
@@ -281,12 +287,16 @@ public class GameManager : MonoBehaviour
             Player1.color = Color.cyan;
             Player2.color = Color.yellow;
             playerTurn = "black";
+            yield return new WaitForSeconds(0.65f);
+            Player2View.onClick.Invoke();
         }
         else
         {
             Player1.color = Color.yellow;
             Player2.color = Color.cyan;
             playerTurn = "white";
+            yield return new WaitForSeconds(0.65f);
+            Player1View.onClick.Invoke();
         }
     
         //Debug.Log("other player holds: " + otherPlayer.name);
