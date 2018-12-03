@@ -21,13 +21,18 @@ public class Board : MonoBehaviour
 
         void Update()
     {
+
+    }
+
+    void FixedUpdate()
+    {
         if (moveDirection == Direction.UP)
         {
             float distCovered = (Time.time - startTime) * speed;
             float fracJourney = distCovered / Vector3.Distance(tempPiece.transform.position, intermediateLocation); ;
             tempPiece.transform.position = Vector3.Lerp(tempPiece.transform.position, intermediateLocation, fracJourney);
             //Debug.Log("inbetween pos: " + tempPiece.transform.position + " Expected post: " + intermediateLocation);
-            
+
             if (tempPiece.transform.position == intermediateLocation)
             {
                 //Debug.Log("entered first if");
@@ -36,7 +41,7 @@ public class Board : MonoBehaviour
                 intermediateLocation.y = intermediateLocation.y + maxHeight;
                 moveDirection = Direction.HORIZONTAL;
             }
-            
+
         }
         else if (moveDirection == Direction.HORIZONTAL)
         {
@@ -63,7 +68,6 @@ public class Board : MonoBehaviour
             }
         }
     }
-
     public GameObject AddPiece(GameObject piece, int col, int row)
     {
         Vector2Int gridPoint = Geometry.GridPoint(col, row);
