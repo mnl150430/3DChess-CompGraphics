@@ -42,6 +42,10 @@ public class GameManager : MonoBehaviour
     public Text Player1;
     public Text Player2;
 
+    public GameObject winPanel;
+    public Text GameoverTxt;
+    public Text WinName;
+
     public Button Player1View;
     public Button Player2View;
 
@@ -183,6 +187,13 @@ public class GameManager : MonoBehaviour
     public void RemovePiece(GameObject piece)
     {
         board.RemovePiece(piece);
+        Debug.Log("We Removed A piece");
+        if (piece.name.Contains("KingBlack"))
+            Debug.Log("Player 1 Wins");
+
+        if (piece.name.Contains("KingWhite"))
+            Debug.Log("Player 2 Wins");
+        //Debug.Log(currentPlayer.capturedPieces);
     }
 
     public void SelectPieceAtGrid(Vector2Int gridPoint)
@@ -319,6 +330,10 @@ public class GameManager : MonoBehaviour
         //remove all coordinates from possible moves that are blocked by pieces
         removeBlockedGrids(currentPiece, possibleMoves, gridCurrentPiece);
 
+
+
+
+
         return possibleMoves;
     }
 
@@ -428,7 +443,12 @@ public class GameManager : MonoBehaviour
                                    gridOtherPiece.x > gridCurrentPiece.x && gridOtherPiece.y < gridCurrentPiece.y && move.x > gridOtherPiece.x && move.y < gridOtherPiece.y);
     }
 
-
+    public void WinScreen(String winPlayer)
+    {
+    winPanel.SetActive();
+    GameoverTxt
+    public Text WinName;
+}
     public void MultiToList()
     {
         int width = pieces.GetLength(0);
