@@ -43,8 +43,8 @@ public class GameManager : MonoBehaviour
     public Text Player2;
 
     public GameObject winPanel;
-    public Text GameoverTxt;
-    public Text WinName;
+    public GameObject GameoverTxt;
+    public Text WinPlayerName;
 
     public Button Player1View;
     public Button Player2View;
@@ -187,12 +187,20 @@ public class GameManager : MonoBehaviour
     public void RemovePiece(GameObject piece)
     {
         board.RemovePiece(piece);
-        Debug.Log("We Removed A piece");
+        //Debug.Log("We Removed A piece");
         if (piece.name.Contains("KingBlack"))
+        {
             Debug.Log("Player 1 Wins");
+            WinScreen("Player 1");
+        }
+            
 
         if (piece.name.Contains("KingWhite"))
+        {
             Debug.Log("Player 2 Wins");
+            WinScreen("Player 2");
+        }
+           
         //Debug.Log(currentPlayer.capturedPieces);
     }
 
@@ -443,12 +451,19 @@ public class GameManager : MonoBehaviour
                                    gridOtherPiece.x > gridCurrentPiece.x && gridOtherPiece.y < gridCurrentPiece.y && move.x > gridOtherPiece.x && move.y < gridOtherPiece.y);
     }
 
-    public void WinScreen(String winPlayer)
+    public void WinScreen(String play)
     {
-    winPanel.SetActive();
-    GameoverTxt
-    public Text WinName;
-}
+        winPanel.SetActive(true);
+        GameoverTxt.SetActive(true);
+        if(play == "Player 2")
+            WinPlayerName.text = PlayerPrefs.GetString("Player2") + " Wins!";
+        else if(play == "Player 1")
+            WinPlayerName.text = PlayerPrefs.GetString("Player1") + " Wins!";
+
+        safeToMove = false;
+        board.enabled = false;
+
+    }
     public void MultiToList()
     {
         int width = pieces.GetLength(0);
